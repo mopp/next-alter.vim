@@ -51,7 +51,6 @@ function! s:get_vim_alter_filepath()
     let info = s:get_current_file_info()
     let directory = expand('%:p:h:t')
 
-    echomsg string(directory)
     if directory == 'autoload'
         return expand('%:p:h') . '/../plugin/' . expand('%:t')
     elseif directory == 'plugin'
