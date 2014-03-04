@@ -32,6 +32,7 @@ let s:default_search_dir = [ '.' , '..', './include', '../include' ]
 
 let g:next_alter#pair_extension = get(g:, 'next_alter#pair_extension', s:default_pair_extension)
 let g:next_alter#search_dir = get(g:, 'next_alter#search_dir', s:default_search_dir)
+let g:next_alter#open_option = get(g:, 'next_alter#open_option', '')
 
 
 " returns current file infomation in dictionary.
@@ -40,13 +41,13 @@ function! s:get_current_file_info()
 endfunction
 
 
-" find argument in exists buffer
+" find argument in exists buffer.
 function! s:find_buffer(file_path)
     return bufname(fnamemodify(a:file_path, ':t'))
 endfunction
 
 
-" return alternate file path in .vim
+" return alternate file path in vim file.
 function! s:get_vim_alter_filepath()
     let info = s:get_current_file_info()
     let directory = expand('%:p:h:t')
@@ -61,7 +62,7 @@ function! s:get_vim_alter_filepath()
 endfunction
 
 
-" return alternate file path
+" return alternate file path.
 function! s:get_alter_filepath()
     let info = s:get_current_file_info()
     let e = info['extension']
@@ -90,23 +91,35 @@ function! s:get_alter_filepath()
 endfunction
 
 
-function! s:open_vim()
-    let alter_vim = s:get_vim_alter_filepath()
-
-    if alter_vim == ''
-        echoerr 'cannot open alternate vim file.'
-        return
-    endif
-
-    execute 'edit' alter_vim
-
-    if !filereadable(alter_vim)
-        redraw
-        echomsg 'created ' . alter_vim
+" open buffer with option.
+function! s:open_buffer(target)
+    if g:next_alter#open_option == ''
+        execute 'edit' a:target
+    else
+        execute g:next_alter#open_option 'split' a:target
     endif
 endfunction
 
 
+" open buffer only vim file.
+function! s:open_vim()
+    let target = s:get_vim_alter_filepath()
+
+    if target == ''
+        echoerr 'cannot open alternate vim file.'
+        return
+    endif
+
+    call s:open_buffer(target)
+
+    if !filereadable(target)
+        redraw
+        echomsg 'created ' . target
+    endif
+endfunction
+
+
+" open buffer.
 function! s:open()
     if !has_key(g:next_alter#pair_extension, s:get_current_file_info()['extension'])
         echoerr 'Pair extension file NOT exists in setting.'
@@ -135,7 +148,7 @@ function! s:open()
         let f = 1
     endif
 
-    execute 'edit' target
+    call s:open_buffer(target)
 
     if f == 1
         redraw
@@ -154,6 +167,28 @@ function! next_alter#open_alter_file()
     else
         call s:open()
     endif
+endfunction
+
+
+" open alternate filepath with option.
+function! next_alter#open_alter_file_option(cmd_arg)
+    if type(a:cmd_arg) != type('')
+        echoerr 'Command argument is invalid !'
+        return
+    endif
+
+    let store = g:next_alter#open_option
+    let g:next_alter#open_option = a:cmd_arg
+
+    call next_alter#open_alter_file()
+
+    let g:next_alter#open_option = store
+endfunction
+
+
+" complete command argumetn.
+function! next_alter#complete(arg_lead, cmd_line, cursor_pos)
+    return filter([ 'vertical', 'aboveleft', 'belowright', 'topleft', 'botright', ], "v:val =~? '^" . a:arg_lead . ".*'")
 endfunction
 
 
