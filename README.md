@@ -1,12 +1,12 @@
 ## next-alter.vim
-This is Vim Plugin for supporting open alternate file.  
-For example, There are **hoge.c**.  
-You execute **:OpenNAlter.** then it opens **hoge.h**.  
-And it opens **hoge.c** when you edit **hoge.h**  
-  
+This is Vim Plugin for supporting open alternate file.
+For example, There are **hoge.c**.
+You execute **:OpenNAlter.** then it opens **hoge.h**.
+And it opens **hoge.c** when you edit **hoge.h**
+
 So, **it can switch c <-> h, cpp <-> hpp and etc.**
-  
-In particular, when you open vim plugin file.  
+
+In particular, when you open vim plugin file.
 **It will switch "autoload/hoge.vim" <-> "plugin/hoge.vim".**
 
 
@@ -19,8 +19,9 @@ NeoBundle 'mopp/next-alter.vim'
 Command is here.
 ```vim
 :OpenNAlter
+:OpenNAlter vertical
 ```
-  
+
 Mapping is here.
 ```vim
 nmap <Leader>an <Plug>(next-alter-open)
@@ -47,6 +48,9 @@ let g:next_alter#pair_extension = {
 
 " this list shows search directory to find alternate file.
 let g:next_alter#search_dir = [ '.' , '..', './include', '../include' ]
+
+" this is used when it opens alternate file buffer.
+let g:next_alter#open_option = 'vertical topleft'
 ```
 
 ## screenshot
