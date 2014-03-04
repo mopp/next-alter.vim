@@ -15,8 +15,8 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 
-nnoremap <silent> <Plug>(next-alter-open) :<C-u>call next_alter#open_alter_file()<CR>
-command! -nargs=? -complete=customlist,next_alter#complete OpenNAlter call next_alter#open_alter_file_option(<q-args>)
+nnoremap <silent> <Plug>(next-alter-open) :<C-u>call next_alter#open_alter_file(0)<CR>
+command! -nargs=? -complete=customlist,next_alter#complete OpenNAlter call next_alter#open_alter_file_option(<q-args>, 0)
 
 
 let &cpo = s:save_cpo

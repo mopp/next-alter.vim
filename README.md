@@ -24,7 +24,9 @@ Command is here.
 
 Mapping is here.
 ```vim
-nmap <Leader>an <Plug>(next-alter-open)
+nmap <Leader>ano <Plug>(next-alter-open)
+nnoremap <expr> <Leader>anb next_alter#open_mapexpr('vertical botright')
+nnoremap <expr> <Leader>ant next_alter#open_mapexpr('vertical topleft')
 ```
 
 ## setting

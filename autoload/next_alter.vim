@@ -90,19 +90,18 @@ function! s:get_alter_filepath()
     return candidates
 endfunction
 
+function! s:get_open_buffer_cmd(target)
+    return (g:next_alter#open_option == '') ? ('edit ' . a:target) : (g:next_alter#open_option . ' split ' . a:target)
+endfunction
 
 " open buffer with option.
 function! s:open_buffer(target)
-    if g:next_alter#open_option == ''
-        execute 'edit' a:target
-    else
-        execute g:next_alter#open_option 'split' a:target
-    endif
+    execute s:get_open_buffer_cmd(a:target)
 endfunction
 
 
 " open buffer only vim file.
-function! s:open_vim()
+function! s:open_vim(is_expmap)
     let target = s:get_vim_alter_filepath()
 
     if target == ''
@@ -110,7 +109,11 @@ function! s:open_vim()
         return
     endif
 
-    call s:open_buffer(target)
+    if a:is_expmap == 0
+        call s:open_buffer(target)
+    else
+        return s:get_open_buffer_cmd(target)
+    endif
 
     if !filereadable(target)
         redraw
@@ -120,7 +123,7 @@ endfunction
 
 
 " open buffer.
-function! s:open()
+function! s:open(is_expmap)
     if !has_key(g:next_alter#pair_extension, s:get_current_file_info()['extension'])
         echoerr 'Pair extension file NOT exists in setting.'
         return
@@ -148,7 +151,11 @@ function! s:open()
         let f = 1
     endif
 
-    call s:open_buffer(target)
+    if a:is_expmap == 0
+        call s:open_buffer(target)
+    else
+        return s:get_open_buffer_cmd()
+    endif
 
     if f == 1
         redraw
@@ -159,19 +166,19 @@ endfunction
 
 
 " open alternate filepath
-function! next_alter#open_alter_file()
+function! next_alter#open_alter_file(is_expmap)
     let e = s:get_current_file_info()['extension']
 
     if e == 'vim' || &filetype == 'vim'
-        call s:open_vim()
+        return s:open_vim(a:is_expmap)
     else
-        call s:open()
+        return s:open(a:is_expmap)
     endif
 endfunction
 
 
 " open alternate filepath with option.
-function! next_alter#open_alter_file_option(cmd_arg)
+function! next_alter#open_alter_file_option(cmd_arg, is_expmap)
     if type(a:cmd_arg) != type('')
         echoerr 'Command argument is invalid !'
         return
@@ -180,15 +187,22 @@ function! next_alter#open_alter_file_option(cmd_arg)
     let store = g:next_alter#open_option
     let g:next_alter#open_option = a:cmd_arg
 
-    call next_alter#open_alter_file()
+    let t = next_alter#open_alter_file(a:is_expmap)
 
     let g:next_alter#open_option = store
+
+    return t
 endfunction
 
 
 " complete command argumetn.
 function! next_alter#complete(arg_lead, cmd_line, cursor_pos)
     return filter([ 'vertical', 'aboveleft', 'belowright', 'topleft', 'botright', ], "v:val =~? '^" . a:arg_lead . ".*'")
+endfunction
+
+
+function! next_alter#open_mapexpr(arg)
+    return ':' . next_alter#open_alter_file_option(a:arg, 1) . ''
 endfunction
 
 
